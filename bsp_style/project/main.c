@@ -27,6 +27,7 @@ int main(void)
 	unsigned char led_state = OFF;
 	unsigned char beep_state = OFF;
 
+	imx6u_clk_init();	/* 初始化系统时钟 */
 	clk_enable();		/* 使能所有的时钟 			*/
 	led_init();			/* 初始化led 			*/
 	beep_init();		/* 初始化beep	 		*/
