@@ -33,12 +33,11 @@ int main(void)
 	beep_init();		/* 初始化beep	 		*/
 	key_init();			/* 初始化key 			*/
 	exit_init();		/* 初始化按键中断			*/
+	epit1_init(0, 66000000/2);
 
 	while (1)
 	{
 		state = !state;
-
-		led_switch(LED0, state);
 		delay(500);
 	}
 
