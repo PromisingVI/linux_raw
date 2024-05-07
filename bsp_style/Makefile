@@ -15,7 +15,8 @@ INCDIRS := imx6ul \
 	bsp/gpio \
 	bsp/int \
 	bsp/exit \
-	bsp/epit
+	bsp/epit \
+	bsp/key_filter
 
 SRCDIRS := project \
 	bsp/clk \
@@ -26,9 +27,10 @@ SRCDIRS := project \
 	bsp/gpio \
 	bsp/int \
 	bsp/exit \
-	bsp/epit
+	bsp/epit \
+	bsp/key_filter
 
-INCLUDE		:= $(patsubst %, -I %, $(INCDIRS))
+INCLUDE := $(patsubst %, -I %, $(INCDIRS))
 
 SFILES := $(foreach dir, $(SRCDIRS), $(wildcard $(dir)/*.S))
 CFILES := $(foreach dir, $(SRCDIRS), $(wildcard $(dir)/*.c))

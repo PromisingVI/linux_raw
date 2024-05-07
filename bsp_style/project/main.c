@@ -20,7 +20,7 @@ Copyright © liuyouwei Co., Ltd. 1998-2019. All rights reserved.
 #include "bsp_beep.h"
 #include "bsp_key.h"
 #include "bsp_int.h"
-#include "bsp_exit.h"
+#include "key_filter.h"
 
 int main(void)
 {
@@ -31,13 +31,12 @@ int main(void)
 	clk_enable();		/* 使能所有的时钟 			*/
 	led_init();			/* 初始化led 			*/
 	beep_init();		/* 初始化beep	 		*/
-	key_init();			/* 初始化key 			*/
-	exit_init();		/* 初始化按键中断			*/
-	epit1_init(0, 66000000/2);
+	key_filter_init();	/* 带有消抖功能的按键 */
 
 	while (1)
 	{
 		state = !state;
+		// led_switch(LED0, state);
 		delay(500);
 	}
 
