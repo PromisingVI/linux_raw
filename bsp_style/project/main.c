@@ -28,16 +28,16 @@ int main(void)
 
 	int_init(); 		/* 初始化中断(一定要最先调用！) */
 	imx6u_clk_init();	/* 初始化系统时钟 			*/
+	delay_init();		/* 初始化延时 */
 	clk_enable();		/* 使能所有的时钟 			*/
 	led_init();			/* 初始化led 			*/
 	beep_init();		/* 初始化beep	 		*/
-	key_filter_init();	/* 带有消抖功能的按键 */
 
 	while (1)
 	{
 		state = !state;
-		// led_switch(LED0, state);
-		delay(500);
+		led_switch(LED0, state);
+		delayms(1000);
 	}
 
 	return 0;

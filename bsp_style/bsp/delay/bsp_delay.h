@@ -13,7 +13,11 @@ Copyright © liuyouwei Co., Ltd. 1998-2019. All rights reserved.
 
 #include "imx6ul.h"
 
+void delay_init(void);
+void delayus(unsigned int t);
+void delayms(unsigned int t);
 void delay(volatile unsigned int n);
+void gpt1_irq_handler(void);
 
 #endif /* __BSP_DELAY_H */
 
