@@ -1,5 +1,5 @@
 CROSS_COMPILE 	?= arm-linux-gnueabihf-
-TARGET		  	?= uart
+TARGET		  	?= bsp
 
 CC 				:= $(CROSS_COMPILE)gcc
 LD				:= $(CROSS_COMPILE)ld
@@ -10,6 +10,7 @@ LIBPATH			:= -lgcc -L /usr/local/arm/gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-g
 
 
 INCDIRS 		:= imx6ul \
+				   stdio/include \
 				   bsp/clk \
 				   bsp/led \
 				   bsp/delay  \
@@ -21,8 +22,9 @@ INCDIRS 		:= imx6ul \
 				   bsp/epittimer \
 				   bsp/keyfilter \
 				   bsp/uart 
-				   			   
+
 SRCDIRS			:= project \
+				   stdio/lib \
 				   bsp/clk \
 				   bsp/led \
 				   bsp/delay \
@@ -61,7 +63,7 @@ $(SOBJS) : obj/%.o : %.S
 	$(CC) -Wall -nostdlib -fno-builtin -c -O2  $(INCLUDE) -o $@ $<
 
 $(COBJS) : obj/%.o : %.c
-	$(CC) -Wall -nostdlib -fno-builtin -c -O2  $(INCLUDE) -o $@ $<
+	$(CC) -Wall -Wa,-mimplicit-it=thumb -nostdlib -fno-builtin -c -O2  $(INCLUDE) -o $@ $<
 	
 clean:
 	rm -rf $(TARGET).elf $(TARGET).dis $(TARGET).bin $(COBJS) $(SOBJS)

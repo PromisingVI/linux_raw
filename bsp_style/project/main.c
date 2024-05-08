@@ -16,6 +16,7 @@ Copyright © zuozhongkai Co., Ltd. 1998-2019. All rights reserved.
 #include "bsp_key.h"
 #include "bsp_int.h"
 #include "bsp_uart.h"
+#include "stdio.h"
 
 /*
  * @description	: main函数
@@ -24,7 +25,7 @@ Copyright © zuozhongkai Co., Ltd. 1998-2019. All rights reserved.
  */
 int main(void)
 {
-	unsigned char a=0;
+	int a , b;
 	unsigned char state = OFF;
 
 	int_init(); 				/* 初始化中断(一定要最先调用！) */
@@ -37,16 +38,10 @@ int main(void)
 
 	while(1)				
 	{	
-		puts("请输入1个字符:");
-		a=getc();
-		putc(a);	//回显功能
-		puts("\r\n");
+		printf("输入两个整数，使用空格隔开:");
+		scanf("%d %d", &a, &b);					 		/* 输入两个整数 */
+		printf("\r\n数据%d + %d = %d\r\n\r\n", a, b, a+b);	/* 输出两个数相加的和 */
 
-		//显示输入的字符
-		puts("您输入的字符为:");
-		putc(a);
-		puts("\r\n\r\n");
-		
 		state = !state;
 		led_switch(LED0,state);
 	}
