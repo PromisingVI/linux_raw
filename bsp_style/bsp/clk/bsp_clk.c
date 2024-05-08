@@ -1,16 +1,27 @@
+#include "bsp_clk.h"
+
 /***************************************************************
-Copyright © liuyouwei Co., Ltd. 1998-2019. All rights reserved.
+Copyright © zuozhongkai Co., Ltd. 1998-2019. All rights reserved.
 文件名	: 	 bsp_clk.c
-作者	   : 刘有为
+作者	   : 左忠凯
 版本	   : V1.0
 描述	   : 系统时钟驱动。
 其他	   : 无
 论坛 	   : www.wtmembed.com
-日志	   : 初版V1.0 2024/4/28 刘有为创建
+日志	   : 初版V1.0 2019/1/3 左忠凯创建
+
+ 		 V2.0	  2019/1/3 左忠凯修改
+ 		 添加了函数imx6u_clkinit()，完成I.MX6U的系统时钟初始化
+
+		 V2.1	  2021/5/3 左忠凯修改
+		 CPU主频改为792MHz
 ***************************************************************/
 
-#include "bsp_clk.h"
-
+/*
+ * @description	: 使能I.MX6U所有外设时钟
+ * @param 		: 无
+ * @return 		: 无
+ */
 void clk_enable(void)
 {
 	CCM->CCGR0 = 0XFFFFFFFF;
@@ -22,25 +33,28 @@ void clk_enable(void)
 	CCM->CCGR6 = 0XFFFFFFFF;
 }
 
-void imx6u_clk_init(void)
+/*
+ * @description	: 初始化系统时钟，设置系统时钟为792Mhz，并且设置PLL2和PLL3各个
+ 				  PFD时钟,所有的时钟频率均按照I.MX6U官方手册推荐的值.
+ * @param 		: 无
+ * @return 		: 无
+ */
+void imx6u_clkinit(void)
 {
 	unsigned int reg = 0;
-
 	/* 1、设置ARM内核时钟为792MHz */
 	/* 1.1、判断当前ARM内核是使用的那个时钟源启动的，正常情况下ARM内核是由pll1_sw_clk驱动的，而
-	 *      pll1_sw_clk有两个来源：pll1_main_clk和step_clk。
+	 *      pll1_sw_clk有两个来源：pll1_main_clk和tep_clk。
 	 *      如果我们要让ARM内核跑到792M的话那必须选择pll1_main_clk作为pll1的时钟源。
 	 *      如果我们要修改pll1_main_clk时钟的话就必须先将pll1_sw_clk从pll1_main_clk切换到step_clk,
 	 *		当修改完pll1_main_clk以后在将pll1_sw_clk切换回pll1_main_clk。而step_clk的时钟源可以选择
 	 * 		板子上的24MHz晶振。
 	 */
-
-	if (0 == (((CCM->CCSR) >> 2) & 0x1))
-	{
-		/* 目前为pll1_main_clk */
-
-		CCM->CCSR &= ~(1 << 8);	/* 配置 step_clk 时钟源为 24MHz OSC */
-		CCM->CCSR |= (1 << 2);	/* 配置 pll1_sw_clk 时钟源为 step_clk */
+	
+	if((((CCM->CCSR) >> 2) & 0x1 ) == 0) 	/* 当前pll1_sw_clk使用的pll1_main_clk*/
+	{	
+		CCM->CCSR &= ~(1 << 8);				/* 配置step_clk时钟源为24MH OSC */	
+		CCM->CCSR |= (1 << 2);				/* 配置pll1_sw_clk时钟源为step_clk */
 	}
 
 	/* 1.2、设置pll1_main_clk为792MHz
@@ -71,14 +85,14 @@ void imx6u_clk_init(void)
 	reg |= 17<<16;				/* PLL3_PFD2=480*18/17=508.24Mhz 	*/
 	reg |= 16<<8;				/* PLL3_PFD1=480*18/16=540Mhz		*/
 	reg |= 12<<0;				/* PLL3_PFD0=480*18/12=720Mhz	 	*/
-	CCM_ANALOG->PFD_480=reg;	/* 设置PLL3_PFD0~3 					*/
+	CCM_ANALOG->PFD_480=reg;	/* 设置PLL3_PFD0~3 					*/	
 
 	/* 4、设置AHB时钟 最小6Mhz， 最大132Mhz (boot rom自动设置好了可以不用设置)*/
 	CCM->CBCMR &= ~(3 << 18); 	/* 清除设置*/ 
 	CCM->CBCMR |= (1 << 18);	/* pre_periph_clk=PLL2_PFD2=396MHz */
 	CCM->CBCDR &= ~(1 << 25);	/* periph_clk=pre_periph_clk=396MHz */
 	while(CCM->CDHIPR & (1 << 5));/* 等待握手完成 */
-
+		
 	/* 修改AHB_PODF位的时候需要先禁止AHB_CLK_ROOT的输出，但是
 	 * 我没有找到关闭AHB_CLK_ROOT输出的的寄存器，所以就没法设置。
 	 * 下面设置AHB_PODF的代码仅供学习参考不能直接拿来使用！！
@@ -92,11 +106,11 @@ void imx6u_clk_init(void)
 	while(CCM->CDHIPR & (1 << 1));/
 * 等待握手完成 */
 #endif
-
+	
 	/* 5、设置IPG_CLK_ROOT最小3Mhz，最大66Mhz (boot rom自动设置好了可以不用设置)*/
 	CCM->CBCDR &= ~(3 << 8);	/* CBCDR的IPG_PODF清零 */
 	CCM->CBCDR |= 1 << 8;		/* IPG_PODF 2分频，IPG_CLK_ROOT=66MHz */
-
+	
 	/* 6、设置PERCLK_CLK_ROOT时钟 */
 	CCM->CSCMR1 &= ~(1 << 6);	/* PERCLK_CLK_ROOT时钟源为IPG */
 	CCM->CSCMR1 &= ~(7 << 0);	/* PERCLK_PODF位清零，即1分频 */

@@ -1,34 +1,36 @@
+#ifndef _BSP_INT_H
+#define _BSP_INT_H
+#include "imx6ul.h"
 /***************************************************************
-Copyright © liuyouwei Co., Ltd. 1998-2019. All rights reserved.
-文件名	: 	 bsp_int.h
-作者	   : 刘有为
+Copyright © zuozhongkai Co., Ltd. 1998-2019. All rights reserved.
+文件名	: 	 bsp_int.c
+作者	   : 左忠凯
 版本	   : V1.0
 描述	   : 中断驱动头文件。
 其他	   : 无
 论坛 	   : www.wtmembed.com
-日志	   : 初版V1.0 2024/5/3 刘有为创建
+日志	   : 初版V1.0 2019/1/4 左忠凯创建
 ***************************************************************/
 
-#ifndef _BSP_INT_H
-#define _BSP_INT_H
-
-#include "imx6ul.h"
-
 /* 中断服务函数形式 */ 
-typedef void (*system_irq_handler_t)(unsigned int gicc_iar, void *param);
+typedef void (*system_irq_handler_t) (unsigned int giccIar, void *param);
 
-/* 中断服务函数结构体 */
+ 
+/* 中断服务函数结构体*/
 typedef struct _sys_irq_handle
 {
-	system_irq_handler_t irq_handler;	/* 中断服务函数 */
-	void *user_param;					/* 中断服务函数参数 */
-} _sys_irq_handle_t;
+    system_irq_handler_t irqHandler; /* 中断服务函数 */
+    void *userParam;                 /* 中断服务函数参数 */
+} sys_irq_handle_t;
 
+
+/* 函数声明 */
 void int_init(void);
-void system_irq_table_init(void);
-void system_register_irq_handler(IRQn_Type irq, system_irq_handler_t handler, void *user_params);
-void system_irq_handler(unsigned int gicc_iar);
-void default_irq_handler(unsigned int gicc_iar, void *user_param);
+void system_irqtable_init(void);
+void system_register_irqhandler(IRQn_Type irq, system_irq_handler_t handler, void *userParam);
+void system_irqhandler(unsigned int giccIar); 
+void default_irqhandler(unsigned int giccIar, void *userParam); 
 
-#endif /* _BSP_INT_H */
 
+
+#endif

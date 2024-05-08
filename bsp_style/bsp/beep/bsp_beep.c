@@ -1,15 +1,20 @@
+#include "bsp_beep.h"
 /***************************************************************
-Copyright © liuyouwei Co., Ltd. 1998-2019. All rights reserved.
+Copyright © zuozhongkai Co., Ltd. 1998-2019. All rights reserved.
 文件名	: bsp_beep.c
-作者	   : 刘有为
+作者	   : 左忠凯
 版本	   : V1.0
 描述	   : 蜂鸣器驱动文件。
 其他	   : 无
 论坛 	   : www.wtmembed.com
-日志	   : 初版V1.0 2024/4/28 刘有为创建
+日志	   : 初版V1.0 2019/1/4 左忠凯创建
 ***************************************************************/
-#include "bsp_beep.h"
 
+/*
+ * @description	: 初始化蜂鸣器对应的IO
+ * @param 		: 无
+ * @return 		: 无
+ */
 void beep_init(void)
 {
 	/* 1、初始化IO复用，复用为GPIO5_IO01 */
@@ -47,4 +52,3 @@ void beep_switch(int status)
 	else if(status == OFF)
 		GPIO5->DR |= (1 << 1);	/* 关闭蜂鸣器 */
 }
-

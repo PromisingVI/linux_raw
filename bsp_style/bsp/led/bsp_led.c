@@ -1,21 +1,26 @@
+#include "bsp_led.h"
 /***************************************************************
-Copyright © liuyouwei Co., Ltd. 1998-2019. All rights reserved.
+Copyright © zuozhongkai Co., Ltd. 1998-2019. All rights reserved.
 文件名	: 	 bsp_led.c
-作者	   : 刘有为
+作者	   : 左忠凯
 版本	   : V1.0
 描述	   : LED驱动文件。
 其他	   : 无
 论坛 	   : www.wtmembed.com
-日志	   : 初版V1.0 2024/4/28 刘有为创建
+日志	   : 初版V1.0 2019/1/4 左忠凯创建
 ***************************************************************/
 
-#include "bsp_led.h"
-
+/*
+ * @description	: 初始化LED对应的GPIO
+ * @param 		: 无
+ * @return 		: 无
+ */
 void led_init(void)
 {
 	/* 1、初始化IO复用 */
 	IOMUXC_SetPinMux(IOMUXC_GPIO1_IO03_GPIO1_IO03,0);		/* 复用为GPIO1_IO03 */
-
+	
+	
 	/* 2、、配置GPIO1_IO03的IO属性	
 	 *bit 16:0 HYS关闭
 	 *bit [15:14]: 00 默认下拉
@@ -35,6 +40,13 @@ void led_init(void)
 	GPIO1->DR &= ~(1 << 3);		
 }
 
+
+/*
+ * @description		: LED控制函数，控制LED打开还是关闭
+ * @param - led		: 要控制的LED灯编号
+ * @param - status	: 0，关闭LED0，1 打开LED0
+ * @return 			: 无
+ */
 void led_switch(int led, int status)
 {	
 	switch(led)
@@ -47,4 +59,3 @@ void led_switch(int led, int status)
 			break;
 	}
 }
-
