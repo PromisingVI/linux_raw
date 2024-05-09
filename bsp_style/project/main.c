@@ -19,6 +19,7 @@ Copyright © zuozhongkai Co., Ltd. 1998-2019. All rights reserved.
 #include "stdio.h"
 #include "bsp_lcd.h"
 #include "bsp_lcdapi.h"
+#include "bsp_rtc.h"
 
 /* 背景颜色索引 */
 unsigned int backcolor[10] = {
@@ -35,6 +36,7 @@ int main(void)
 {
 	unsigned char index = 0;
 	unsigned char state = OFF;
+	struct rtc_datetime rtcdate = {0};
 
 	int_init(); 				/* 初始化中断(一定要最先调用！) */
 	imx6u_clkinit();			/* 初始化系统时钟 			*/
@@ -44,6 +46,7 @@ int main(void)
 	beep_init();				/* 初始化beep	 		*/
 	uart_init();				/* 初始化串口，波特率115200 */
 	lcd_init();					/* 初始化LCD 			*/
+	rtc_init();					/* 初始化 RTC */
 
 	tftlcd_dev.forecolor = LCD_RED;	
 
@@ -63,6 +66,10 @@ int main(void)
 		state = !state;
 		led_switch(LED0,state);
 		delayms(1000);
+
+		memset(&rtcdate, 0, sizeof(struct rtc_datetime));
+		rtc_getdatetime(&rtcdate);
+		RTC_INFO("UTC: %u-%u-%u %u-%u-%u", rtcdate.year, rtcdate.month, rtcdate.day, rtcdate.hour, rtcdate.minute, rtcdate.second);
 
 #if 0
 		index++;
