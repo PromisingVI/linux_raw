@@ -20,6 +20,8 @@ Copyright © zuozhongkai Co., Ltd. 1998-2019. All rights reserved.
 #include "bsp_lcd.h"
 #include "bsp_lcdapi.h"
 #include "bsp_rtc.h"
+#include "bsp_i2c.h"
+#include "bsp_ap3216c.h"
 
 /* 背景颜色索引 */
 unsigned int backcolor[10] = {
@@ -34,9 +36,8 @@ unsigned int backcolor[10] = {
  */
 int main(void)
 {
-	unsigned char index = 0;
+	unsigned short ir, als, ps;
 	unsigned char state = OFF;
-	struct rtc_datetime rtcdate = {0};
 
 	int_init(); 				/* 初始化中断(一定要最先调用！) */
 	imx6u_clkinit();			/* 初始化系统时钟 			*/
@@ -46,43 +47,38 @@ int main(void)
 	beep_init();				/* 初始化beep	 		*/
 	uart_init();				/* 初始化串口，波特率115200 */
 	lcd_init();					/* 初始化LCD 			*/
-	rtc_init();					/* 初始化 RTC */
 
 	tftlcd_dev.forecolor = LCD_RED;	
+	lcd_show_string(30, 50, 200, 16, 16, (char*)"ALPHA-IMX6U IIC TEST");
+	lcd_show_string(30, 70, 200, 16, 16, (char*)"AP3216C TEST");
+	lcd_show_string(30, 90, 200, 16, 16, (char*)"ATOM@ALIENTEK");
+	lcd_show_string(30, 110, 200, 16, 16, (char*)"2019/3/26");
 
-	while(1)				
-	{	
-		lcd_clear(backcolor[index]);
-		delayms(1);
-		lcd_show_string(10, 40, 260, 32, 32,(char*)"ALPHA IMX6U");
-		lcd_show_string(10, 80, 240, 24, 24,(char*)"RGBLCD TEST");
-		lcd_show_string(10, 110, 240, 16, 16,(char*)"ATOM@ALIENTEK");
-		lcd_show_string(10, 130, 240, 12, 12,(char*)"2019/8/14");
-
-		index++;
-		if(index == 10)
-			index = 0;
-
-		state = !state;
-		led_switch(LED0,state);
-		delayms(1000);
-
-		memset(&rtcdate, 0, sizeof(struct rtc_datetime));
-		rtc_getdatetime(&rtcdate);
-		RTC_INFO("UTC: %u-%u-%u %u-%u-%u", rtcdate.year, rtcdate.month, rtcdate.day, rtcdate.hour, rtcdate.minute, rtcdate.second);
-
-#if 0
-		index++;
-		if(index == 10)
-			index = 0;
-		lcd_fill(0, 300, 1023, 599, backcolor[index]);
-		lcd_show_string(800,10,240,32,32,(char*)"INDEX=");  /*显示字符串				  */
-		lcd_shownum(896,10, index, 2, 32); 					/* 显示数字，叠加显示	*/
-		
-		state = !state;
-		led_switch(LED0,state);
-		delayms(1000);	/* 延时一秒	*/
-#endif
+	while(ap3216c_init())		/* 检测不到AP3216C */
+	{
+		lcd_show_string(30, 130, 200, 16, 16, (char*)"AP3216C Check Failed!");
+		I2C_INFO("AP3216C Check Failed!");
+		delayms(500);
+		lcd_show_string(30, 130, 200, 16, 16, (char*)"Please Check!        ");
+		delayms(500);
 	}
+
+	lcd_show_string(30, 130, 200, 16, 16, (char*)"AP3216C Ready!");  
+    lcd_show_string(30, 160, 200, 16, 16, (char*)" IR:");	 
+	lcd_show_string(30, 180, 200, 16, 16, (char*)" PS:");	
+	lcd_show_string(30, 200, 200, 16, 16, (char*)"ALS:");	
+	tftlcd_dev.forecolor = LCD_BLUE;
+
+	while(1)					
+	{
+		ap3216c_readdata(&ir, &ps, &als);		/* 读取数据		  	*/
+		lcd_shownum(30 + 32, 160, ir, 5, 16);	/* 显示IR数据 		*/
+		lcd_shownum(30 + 32, 180, ps, 5, 16);	/* 显示PS数据 		*/
+		lcd_shownum(30 + 32, 200, als, 5, 16);	/* 显示ALS数据 	*/ 
+		delayms(120);
+		state = !state;
+		led_switch(LED0,state);	
+	}
+
 	return 0;
 }

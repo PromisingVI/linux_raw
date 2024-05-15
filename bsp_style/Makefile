@@ -23,7 +23,9 @@ INCDIRS 		:= imx6ul \
 				   bsp/keyfilter \
 				   bsp/uart \
 				   bsp/lcd \
-				   bsp/rtc
+				   bsp/rtc \
+				   bsp/i2c \
+				   bsp/ap3216c
 
 SRCDIRS			:= project \
 				   stdio/lib \
@@ -39,7 +41,9 @@ SRCDIRS			:= project \
 				   bsp/keyfilter \
 				   bsp/uart \
 				   bsp/lcd \
-				   bsp/rtc
+				   bsp/rtc \
+				   bsp/i2c \
+				   bsp/ap3216c
 				   
 				   
 INCLUDE			:= $(patsubst %, -I %, $(INCDIRS))
