@@ -172,14 +172,14 @@ void lcd_init(void)
      * 初始化ELCDIF的寄存器CTRL1
      * bit [19:16]  : 0X7 ARGB模式下，传输24位数据，A通道不用传输
 	 */
-	LCDIF->CTRL1 |= (0x7 << 16);
+	LCDIF->CTRL1 = (0x7 << 16);
 
 	/*
       * 初始化ELCDIF的寄存器TRANSFER_COUNT寄存器
       * bit [31:16]  : 高度
       * bit [15:0]   : 宽度
 	  */
-	LCDIF->TRANSFER_COUNT = (tftlcd_dev.height << 16) | (tftlcd_dev.width);
+	LCDIF->TRANSFER_COUNT = (tftlcd_dev.height << 16) | (tftlcd_dev.width << 0);
 
 	/*
      * 初始化ELCDIF的VDCTRL0寄存器
@@ -197,13 +197,13 @@ void lcd_init(void)
 	if (ATKVGA == lcdid)
 	{
 		/* VGA需要特殊处理 */
-		LCDIF->VDCTRL0 |= (0 << 29) | (1 << 28) |
+		LCDIF->VDCTRL0 = (0 << 29) | (1 << 28) |
 						  (0 << 27) | (0 << 26) | (1 << 25) |
 						  (0 << 24) | (1 << 21) | (1 << 20) | (tftlcd_dev.vspw << 0);
 	}
 	else
 	{
-		LCDIF->VDCTRL0 |= (0 << 29) | (1 << 28) |
+		LCDIF->VDCTRL0 = (0 << 29) | (1 << 28) |
 						  (0 << 27) | (0 << 26) | (0 << 25) |
 						  (1 << 24) | (1 << 21) | (1 << 20) | (tftlcd_dev.vspw << 0);
 	}
@@ -220,7 +220,7 @@ void lcd_init(void)
 	  * bit[31:18] ：hsw
 	  * bit[17:0]  : HSYNC总周期
 	  */
-	LCDIF->VDCTRL2 |= (tftlcd_dev.hspw << 18) | (tftlcd_dev.width + tftlcd_dev.hspw + tftlcd_dev.hfpd + tftlcd_dev.hbpd);
+	LCDIF->VDCTRL2 = (tftlcd_dev.hspw << 18) | (tftlcd_dev.width + tftlcd_dev.hspw + tftlcd_dev.hfpd + tftlcd_dev.hbpd);
 
 	/*
 	 * 初始化ELCDIF的VDCTRL3寄存器
@@ -228,7 +228,7 @@ void lcd_init(void)
 	 * bit[27:16] ：水平等待时钟数
 	 * bit[15:0]  : 垂直等待时钟数
 	 */
-	LCDIF->VDCTRL3 |= ((tftlcd_dev.hspw + tftlcd_dev.hbpd) << 16) | (tftlcd_dev.vbpd + tftlcd_dev.vspw);
+	LCDIF->VDCTRL3 = ((tftlcd_dev.hspw + tftlcd_dev.hbpd) << 16) | (tftlcd_dev.vbpd + tftlcd_dev.vspw);
 
 	/*
 	 * 初始化ELCDIF的VDCTRL4寄存器
@@ -236,14 +236,14 @@ void lcd_init(void)
 	 * bit[18] 1 : 当使用VSHYNC、HSYNC、DOTCLK的话此为置1
 	 * bit[17:0]  : 宽度
 	 */
-	LCDIF->VDCTRL4 |= (1 << 18) | tftlcd_dev.width;
+	LCDIF->VDCTRL4 = (1 << 18) | tftlcd_dev.width;
 
 	/*
      * 初始化ELCDIF的CUR_BUF和NEXT_BUF寄存器
      * 设置当前显存地址和下一帧的显存地址
 	 */
-	LCDIF->CUR_BUF = tftlcd_dev.framebuffer;
-	LCDIF->NEXT_BUF = tftlcd_dev.framebuffer;
+	LCDIF->CUR_BUF = (unsigned int)tftlcd_dev.framebuffer;
+	LCDIF->NEXT_BUF = (unsigned int)tftlcd_dev.framebuffer;
 
 	/* 使能LCD */
 	lcd_enable();
@@ -526,8 +526,6 @@ void lcd_enable(void)
 {
 	LCDIF->CTRL |= 1<<0; /* 使能ELCDIF */
 }
-
-void video_pllinit(unsigned char loopdivi, unsigned char postdivi);
 
 /*
  * @description		: 画点函数 
