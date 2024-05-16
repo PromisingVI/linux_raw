@@ -25,7 +25,9 @@ INCDIRS 		:= imx6ul \
 				   bsp/lcd \
 				   bsp/rtc \
 				   bsp/i2c \
-				   bsp/ap3216c
+				   bsp/ap3216c \
+				   bsp/spi \
+				   bsp/icm20608
 
 SRCDIRS			:= project \
 				   stdio/lib \
@@ -43,9 +45,10 @@ SRCDIRS			:= project \
 				   bsp/lcd \
 				   bsp/rtc \
 				   bsp/i2c \
-				   bsp/ap3216c
-				   
-				   
+				   bsp/ap3216c \
+				   bsp/spi \
+				   bsp/icm20608
+
 INCLUDE			:= $(patsubst %, -I %, $(INCDIRS))
 
 SFILES			:= $(foreach dir, $(SRCDIRS), $(wildcard $(dir)/*.S))
@@ -71,7 +74,7 @@ $(SOBJS) : obj/%.o : %.S
 	$(CC) -Wall -nostdlib -fno-builtin -c -O2  $(INCLUDE) -o $@ $<
 
 $(COBJS) : obj/%.o : %.c
-	$(CC) -Wall -Wa,-mimplicit-it=thumb -nostdlib -fno-builtin -c -O2  $(INCLUDE) -o $@ $<
+	$(CC) -Wall -march=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=hard -Wa,-mimplicit-it=thumb -nostdlib -fno-builtin -c -O2  $(INCLUDE) -o $@ $<
 	
 clean:
 	rm -rf $(TARGET).elf $(TARGET).dis $(TARGET).bin $(COBJS) $(SOBJS)
